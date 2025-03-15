@@ -2,11 +2,14 @@ const jwtToken = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const dotenv = require('../config/env');
 
-
-exports.jwtTokenGeneration = async (userDetaails) => {
+exports.jwtTokenGeneration = async (userDetails) => {
     try {
+        const data = {
+            _id: userDetails._id,
+            User_Role: userDetails.userRole ? userDetails.userRole : 2
+        }
          const token = jwtToken.sign(
-            { _id: userDetaails._id, User_Role: userDetaails.User_Role }, 
+            data, 
             dotenv.jwtSecret, 
             { expiresIn: "30d" }
         );
@@ -79,7 +82,6 @@ exports.verifyOtp = async (req, res) => {
 
 exports.verifyToken = async (req, res, next) => {
         const token = req.headers['authorization'];
-
         if(!token) {
             return res.status(403).json({ status: false, message: 'Access denied, no token provided' });
         }
