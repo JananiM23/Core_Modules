@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 exports.register = async (req, res) => {
     try {
         const { name, email, password, userRole } = req.body;
+        if(!password) return res.status(403).send({ status: false , message: `Password is required`})
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userDetails = new user({ name, email, password: hashedPassword, userRole, isApproved: userRole === 1 ? true : false });
