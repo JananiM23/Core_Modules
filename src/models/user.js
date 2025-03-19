@@ -15,7 +15,6 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     Otp: {
         type: String,
@@ -26,6 +25,10 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     isApproved: {
+        type: Boolean,
+        default: false
+    },
+    OAuthUser: {
         type: Boolean,
         default: false
     }

@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/approveUser', userManagementController.approveUser);
 router.post('/rejectUser', userManagementController.rejectUser);
 router.post('/adminCreateUser', userManagementController.adminCreateUser);
-router.post('/getUserList', commonService.verifyToken, userManagementController.getUserList);
+router.get('/getUserList', commonService.verifyToken, userManagementController.getUserList);
 
 module.exports = router;

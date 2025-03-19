@@ -50,8 +50,6 @@ exports.getUserList = async (req, res) => {
     try {
         const { id } = req.body;
         const isAdmin = await User.findOne({ _id: id });
-        console.log("isAdmin", isAdmin);
-        
 
         if(isAdmin.userRole !== 1) {
             return res.status(403).json({ status: false, message: "Access denied, admin only able to acces this page" });
