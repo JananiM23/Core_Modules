@@ -7,11 +7,13 @@ const mongoose = require('mongoose');
 
 exports.register = async (req, res) => {
     try {
-        const { name, email, password, userRole } = req.body;
+        // console.log("regi request", req);
+        
+        const { name, email, password, userRole, mobile } = req.body;
         if(!password) return res.status(403).send({ status: false , message: `Password is required`})
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const userDetails = new user({ name, email, password: hashedPassword, userRole, isApproved: userRole === 1 ? true : false });
+        const userDetails = new user({ name, email, password: hashedPassword, userRole, mobile, isApproved: userRole === 1 ? true : false });
         await userDetails.save();
         res.status(201).json({ message: "User Registered Successfully" });
     } catch(error) {
@@ -21,8 +23,11 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
+        // console.log("login", req);
+        
         const { email, password } = req.body;
         const getUser = await user.findOne({ email });
+        
 
         if(!getUser){
             return res.status(403).json({ status: false, message: "User details not found"});
@@ -39,7 +44,7 @@ exports.login = async (req, res) => {
 
         const token = await commonService.jwtTokenGeneration(getUser);
         
-        return res.status(201).json({ status: true, message: "User loggined successfully", token });
+        return res.status(201).json({ status: true, message: "User loggined successfully", token, Role: getUser.userRole });
 
     } catch(error) {
         return res.status(500).json({ status: false, error: error.message });
@@ -146,6 +151,22 @@ exports.forgotPassword = async (req, res) => {
         const sendMail = await commonService.sendMail({email, otp, subject: 'Forgot password verification'});
 
         return res.status(200).json({ status: true, message: "Reset link sent to email", resetToken });
+    } catch (error) {
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
+
+exports.changePassword = async (req, res) => {
+    try {
+        const { otp, email } = req.body;
+        const userInfo = await user.findOne({ email });
+
+        if(otp !== userInfo.Otp) {
+            return res.status(400).json({ status: false, message: "Otp do not match"});
+        }
+
+        return res.status(200).json({ status: true, message: "OTP verified successfully" });
+
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }

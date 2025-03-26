@@ -4,9 +4,9 @@ const commonService = require('../services/commonService');
 
 const router = express.Router();
 
-router.post('/approveUser', userManagementController.approveUser);
-router.post('/rejectUser', userManagementController.rejectUser);
+router.post('/approveUser/:id', userManagementController.approveUser);
+router.post('/rejectUser/:id', userManagementController.rejectUser);
 router.post('/adminCreateUser', userManagementController.adminCreateUser);
-router.get('/getUserList', commonService.verifyToken, userManagementController.getUserList);
+router.get('/getUserList', userManagementController.getUserList);
 
 module.exports = router;

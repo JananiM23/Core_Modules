@@ -22,7 +22,11 @@ const UserSchema = new mongoose.Schema({
     },
     userRole: {
         type: Number,
-        required: true
+        // required: true
+    },
+    mobile: {
+        type: Number,
+        // required: true
     },
     isApproved: {
         type: Boolean,
