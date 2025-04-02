@@ -1,0 +1,195 @@
+openapi: 3.0.0
+info:
+  title: My API
+  description: API documentation for my Express server
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local server
+
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "201":
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "User logged in successfully"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR..."
+                  Role:
+                    type: string
+                    example: "admin"
+        "400":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid credentials"
+        "403":
+          description: User not found or not approved by Admin
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "User details not found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+
+  paths:
+  /api/auth/register:
+    post:
+      summary: User Registration
+      description: Registers a new user and hashes the password before saving.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - userRole
+                - mobile
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "password123"
+                userRole:
+                  type: integer
+                  example: 1
+                  description: "1 for Admin, 2 for User"
+                mobile:
+                  type: string
+                  example: "9876543210"
+      responses:
+        "201":
+          description: Successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "User Registered Successfully"
+        "403":
+          description: Password is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Password is required"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Error:
+                    type: string
+                    example: "Internal Server Error"
+
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: username
+                email:
+                  type: string
+                  example: "user@gmail.com"
+                password: 
+                type: string
+                example: "password123"
+                mobile: 
+                type: number
+                example: "0000"
+      responses:
+        "201":
+          description: User profile data
+        "500":
+          description: User not registered
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
