@@ -42,9 +42,13 @@ exports.login = async (req, res) => {
             return res.status(400).json({ status: false, message: "Invalid credentials" });
         }
 
-        const token = await commonService.jwtTokenGeneration(getUser);
+        const accessToken = await commonService.jwtAccessTokenGeneration(getUser);
+        const refreshToken = await commonService.jwtRefershTokenGeneration(getUser);
         
-        return res.status(201).json({ status: true, message: "User loggined successfully", token, Role: getUser.userRole });
+        // return res.status(201).json({ status: true, message: "User loggined successfully", accessToken, refreshToken, Role: getUser.userRole });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" })
+            .header("Authorization", accessToken)
+            .json({ message: "Login successful", accessToken });
 
     } catch(error) {
         return res.status(500).json({ status: false, error: error.message });
@@ -65,7 +69,8 @@ exports.sendOtp = async (req, res) => {
         await user.updateOne({ _id: userInfo._id }, 
             { $set: { Otp: otp }}).exec();
         
-        const sendEmail = await commonService.sendMail({email, otp, subject: 'Your OTP Code'});
+        const subject = 'Your OTP Code';
+        const sendEmail = await commonService.sendMail(email, otp, subject);
 
         if(!sendEmail) {
             return res.status(400).json({ status: false, message: "Mail does not sent" });
@@ -132,8 +137,6 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const userInfo = await user.findOne({ email });
-        console.log("userInfo", userInfo);
-        
 
         if(!userInfo) {
             return res.status(400).json({ status: false, message: "User details not found" });
@@ -147,10 +150,11 @@ exports.forgotPassword = async (req, res) => {
             { $set: { Otp: otp }}
         );
 
-        const resetLink = `http://localhost:3000/reset?token=${resetToken}`;
-        const sendMail = await commonService.sendMail({email, otp, subject: 'Forgot password verification'});
+        // const resetLink = `http://localhost:3000/reset?token=${resetToken}`;
+        const subject = "Forgot password verification";
+        const sendMail = await commonService.sendMail(email, otp, subject);
 
-        return res.status(200).json({ status: true, message: "Reset link sent to email", resetToken });
+        return res.status(200).json({ status: true, message: "OTP sent successfully" });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -197,6 +201,11 @@ exports.resetPassword = async (req, res) => {
      } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
      }
+}
+
+exports.logout = async (req, res) => {
+    res.clearCookie("refreshToken");
+    res.json({ message: "Logged out successfully" });
 }
 
  

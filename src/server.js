@@ -10,6 +10,7 @@ const userRoute = require('./routes/userManagementRoute');
 const OAuth = require('./routes/OAuthRoute');
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
+const cookieParser = require('cookie-parser');
 
 const swaggerDocument = YAML.load("./swagger.yaml");
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(rateLimit);
+app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);

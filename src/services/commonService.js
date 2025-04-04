@@ -2,7 +2,7 @@ const jwtToken = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const dotenv = require('../config/env');
 
-exports.jwtTokenGeneration = async (userDetails) => {
+exports.jwtAccessTokenGeneration = async (userDetails) => {
     try {
         const data = {
             _id: userDetails._id,
@@ -11,7 +11,24 @@ exports.jwtTokenGeneration = async (userDetails) => {
          const token = jwtToken.sign(
             data, 
             dotenv.jwtSecret, 
-            { expiresIn: "30d" }
+            { expiresIn: "1h" }
+        );
+        return token;     
+    } catch (error) {
+        return error;
+    }
+}
+
+exports.jwtRefershTokenGeneration = async (userDetails) => {
+    try {
+        const data = {
+            _id: userDetails._id,
+            User_Role: userDetails.userRole ? userDetails.userRole : 2
+        }
+         const token = jwtToken.sign(
+            data, 
+            dotenv.jwtSecret, 
+            { expiresIn: "1d" }
         );
         return token;     
     } catch (error) {
@@ -44,7 +61,7 @@ exports.sendMail = async (email, otp, subject) => {
             from: dotenv.email_user,
             to: 'jananimurugesan23@gmail.com',
             subject: subject,
-            otpTemplate,
+            html: otpTemplate,
             text: 'SecureAuthApi Testing'
         });
 
